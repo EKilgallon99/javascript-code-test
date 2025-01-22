@@ -1,0 +1,30 @@
+{
+  "name": "javascript-code-test",
+  "version": "1.0.0",
+  "description": "Book search API",
+  "main": "example-client.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint --fix .",
+    "format": "prettier --write .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "npx ts-node ./src/example-client.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EKilgallon99/javascript-code-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
