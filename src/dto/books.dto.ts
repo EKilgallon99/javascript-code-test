@@ -2,10 +2,10 @@ export interface BookByAuthorDto {
   book: {
     title: string;
     author: string;
-    isbn: number;
+    isbn: string;
   };
   stock: {
-    quantity: number;
-    price: number;
+    quantity: string;
+    price: string;
   };
 }

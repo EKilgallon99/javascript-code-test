@@ -1,14 +1,15 @@
-import { BookByAuthor, QueryParams } from '../types/books.types';
+import {
+  BookByAuthor,
+  FormatType,
+  methodType,
+  QueryParams,
+} from '../types/books.types';
 import { BookByAuthorDto } from './dto/books.dto';
 import {
   BookFromJsonTransformer,
   BookFromXMLTransformer,
 } from './utils/books.utils';
 import { ArrayFromChildNodes, XMLFromString } from './utils/xml.utils';
-
-enum methodType {
-  GET = 'GET',
-}
 
 export class BookSearchApiClient {
   format: string;
@@ -32,13 +33,19 @@ export class BookSearchApiClient {
 
     return await fetch(`${this.basePath}/${path}?${qpString}`, {
       method: method,
-    });
+    })
+      .then((res) => {
+        return res;
+      })
+      .catch((e) => {
+        throw new Error(`Fetch failed: ${e}`);
+      });
   }
 
   getBooksByAuthor(
     authorName: string,
     limit: number = 10,
-  ): Promise<BookByAuthor[]> {
+  ): Promise<BookByAuthor[] | undefined> {
     const result = this.useHttpRequest(methodType.GET, 'by-author', [
       { key: 'q', value: authorName },
       { key: 'limit', value: limit.toString() },
@@ -47,19 +54,22 @@ export class BookSearchApiClient {
       .then(async (res: Response) => {
         if (res.status === 200) {
           switch (this.format) {
-            case 'json':
+            case FormatType.JSON:
               const json = await res.json();
-              return json.map((item: BookByAuthorDto) => {
+              const parsedJson: BookByAuthorDto[] = JSON.parse(json);
+              return parsedJson.map((item: BookByAuthorDto) => {
                 return BookFromJsonTransformer(item);
               });
-            case 'xml':
+            case FormatType.XML:
               const textResponse = await res.text();
               const childNodesArray = ArrayFromChildNodes(
                 XMLFromString(textResponse),
               );
+
               return childNodesArray.map((item: ChildNode) => {
                 return BookFromXMLTransformer(item);
               });
+
             default:
               throw new Error(`Unexpected format: ${this.format}`);
           }
@@ -67,7 +77,7 @@ export class BookSearchApiClient {
       })
       .catch((e) => {
         throw new Error(
-          `Failed to get books by author from api.book-seller-example.com: ${e}`,
+          `Failed to get books by author from ${this.basePath}: ${e}`,
         );
       });
 
