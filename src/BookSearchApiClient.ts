@@ -56,7 +56,6 @@ export class BookSearchApiClient {
       { key: 'format', value: this.format },
     ])
       .then(async (res: Response) => {
-        if (res.status === 200) {
           switch (this.format) {
             case FormatType.JSON:
               const json = await res.json();
@@ -77,7 +76,6 @@ export class BookSearchApiClient {
             default:
               throw new Error(`Unexpected format: ${this.format}`);
           }
-        }
       })
       .catch((e) => {
         throw new Error(
