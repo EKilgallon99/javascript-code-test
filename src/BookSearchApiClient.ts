@@ -4,12 +4,16 @@ import {
   methodType,
   QueryParams,
 } from '../types/books.types';
-import { BookByAuthorDto } from './dto/books.dto';
+import {
+  BookByAuthorDto,
+  BookByAuthorFromXml,
+  BookByAuthorXMLJson,
+} from './dto/books.dto';
 import {
   BookFromJsonTransformer,
-  BookFromXMLTransformer,
+  BookFromXMLJsonTransformer,
 } from './utils/books.utils';
-import { ArrayFromChildNodes, XMLFromString } from './utils/xml.utils';
+import { XMLJSONFromString } from './utils/xml.utils';
 
 export class BookSearchApiClient {
   format: string;
@@ -62,13 +66,13 @@ export class BookSearchApiClient {
               });
             case FormatType.XML:
               const textResponse = await res.text();
-              const childNodesArray = ArrayFromChildNodes(
-                XMLFromString(textResponse),
+              const XMLasJson: BookByAuthorFromXml =
+                await XMLJSONFromString(textResponse);
+              return XMLasJson.document.children.map(
+                (item: BookByAuthorXMLJson) => {
+                  return BookFromXMLJsonTransformer(item);
+                },
               );
-
-              return childNodesArray.map((item: ChildNode) => {
-                return BookFromXMLTransformer(item);
-              });
 
             default:
               throw new Error(`Unexpected format: ${this.format}`);

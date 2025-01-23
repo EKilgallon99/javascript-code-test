@@ -1,5 +1,5 @@
 import { BookSearchApiClient } from '../src/BookSearchApiClient.ts';
-import { mockBookJSON, mockBookXML, mockTransformedBook } from './consts.ts';
+import { mockBooksXML, mockBooksJSON, mockTransformedBooks } from './consts.ts';
 
 describe('Book Search API CLient', () => {
   afterEach(() => {
@@ -9,7 +9,7 @@ describe('Book Search API CLient', () => {
   it('Should get books by author - JSON format', async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
-        json: () => Promise.resolve(JSON.stringify([mockBookJSON])),
+        json: () => Promise.resolve(JSON.stringify(mockBooksJSON)),
         status: 200,
       }),
     ) as jest.Mock;
@@ -20,13 +20,13 @@ describe('Book Search API CLient', () => {
       'http://api.book-seller-example.com/by-author?q=Shakespeare&limit=10&format=json',
       { method: 'GET' },
     );
-    expect(res).toEqual([mockTransformedBook]);
+    expect(res).toEqual(mockTransformedBooks);
   });
 
   it('Should get books by author - XML format', async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
-        text: () => Promise.resolve([mockBookXML]),
+        text: () => Promise.resolve(mockBooksXML),
         status: 200,
       }),
     ) as jest.Mock;
@@ -37,6 +37,7 @@ describe('Book Search API CLient', () => {
       'http://api.book-seller-example.com/by-author?q=Shakespeare&limit=10&format=xml',
       { method: 'GET' },
     );
-    expect(res).toEqual([mockTransformedBook]);
+
+    expect(res).toEqual(mockTransformedBooks);
   });
 });

@@ -1,8 +1,6 @@
-export const XMLFromString = (data: string) => {
-  const parser = new DOMParser();
-  return parser.parseFromString(data, 'application/xml');
-};
+import { parseStringPromise } from 'xml2js';
 
-export const ArrayFromChildNodes = (xml: Document) => {
-  return Array.from(xml.documentElement.childNodes);
+export const XMLJSONFromString = async (data: string) => {
+  const value = await parseStringPromise(data);
+  return value;
 };

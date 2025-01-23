@@ -1,4 +1,4 @@
-import { BookByAuthorDto } from '../dto/books.dto';
+import { BookByAuthorDto, BookByAuthorXMLJson } from '../dto/books.dto';
 
 export const BookFromJsonTransformer = (data: BookByAuthorDto) => {
   return {
@@ -10,12 +10,12 @@ export const BookFromJsonTransformer = (data: BookByAuthorDto) => {
   };
 };
 
-export const BookFromXMLTransformer = (data: ChildNode) => {
+export const BookFromXMLJsonTransformer = (data: BookByAuthorXMLJson) => {
   return {
-    title: data.childNodes[0].childNodes[0].nodeValue || '',
-    author: data.childNodes[0].childNodes[1].nodeValue || '',
-    isbn: data.childNodes[0].childNodes[2].nodeValue || '',
-    quantity: data.childNodes[1].childNodes[0].nodeValue || '',
-    price: data.childNodes[1].childNodes[1].nodeValue || '',
+    title: data.book[0].title[0],
+    author: data.book[0].author[0],
+    isbn: data.book[0].isbn[0],
+    quantity: data.stock[0].quantity[0],
+    price: data.stock[0].price[0],
   };
 };
