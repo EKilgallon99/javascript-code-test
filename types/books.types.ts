@@ -7,12 +7,14 @@ export enum FormatType {
   XML = 'xml',
 }
 
-export interface BookByAuthor {
+export interface Book {
   title: string;
-  author: string;
   isbn: string;
   quantity: string;
   price: string;
+  author?: string;
+  publisher?: string;
+  yearPubished?: string;
 }
 
 export interface QueryParams {

@@ -1,19 +1,25 @@
 import {
-  BookByAuthor,
+  Book,
   FormatType,
   methodType,
   QueryParams,
 } from '../types/books.types';
+import { APIBasePath } from './api';
 import {
-  BookByAuthorDto,
-  BookByAuthorFromXml,
-  BookByAuthorXMLJson,
-} from './dto/books.dto';
+  BookSellerExampleBookFromXml,
+  BookSellerExampleDto,
+  BookSellerExampleXMLJson,
+} from './book-seller-example/dto/bookSellerExample.dto';
 import {
-  BookFromJsonTransformer,
-  BookFromXMLJsonTransformer,
-} from './utils/books.utils';
+  BookFromBookSellerExampleJsonTransformer,
+  BookFromBookSellerExampleXMLJsonTransformer,
+} from './book-seller-example/bookSellerExample.transformer';
 import { XMLJSONFromString } from './utils/xml.utils';
+import {
+  getAuthorPathAndQP,
+  getPublisherPathAndQP,
+  getYearPublishedPathAndQP,
+} from './book-seller-example/bookSellerExample';
 
 export class BookSearchApiClient {
   format: string;
@@ -46,43 +52,91 @@ export class BookSearchApiClient {
       });
   }
 
-  getBooksByAuthor(
-    authorName: string,
-    limit: number = 10,
-  ): Promise<BookByAuthor[] | undefined> {
-    const result = this.useHttpRequest(methodType.GET, 'by-author', [
-      { key: 'q', value: authorName },
-      { key: 'limit', value: limit.toString() },
-      { key: 'format', value: this.format },
-    ])
+  private async getBookByQuery(
+    queryParams: QueryParams[],
+    path: string,
+  ): Promise<Book[] | undefined> {
+    return this.useHttpRequest(methodType.GET, path, queryParams)
       .then(async (res: Response) => {
-          switch (this.format) {
-            case FormatType.JSON:
-              const json = await res.json();
-              const parsedJson: BookByAuthorDto[] = JSON.parse(json);
-              return parsedJson.map((item: BookByAuthorDto) => {
-                return BookFromJsonTransformer(item);
+        switch (this.format) {
+          case FormatType.JSON:
+            const json = await res.json();
+            if (this.basePath === APIBasePath.Book_Seller_Example) {
+              const parsedJson: BookSellerExampleDto[] = JSON.parse(json);
+              return parsedJson.map((item: BookSellerExampleDto) => {
+                return BookFromBookSellerExampleJsonTransformer(item);
               });
-            case FormatType.XML:
-              const textResponse = await res.text();
-              const XMLasJson: BookByAuthorFromXml =
+            } else {
+              return undefined;
+            }
+
+          case FormatType.XML:
+            const textResponse = await res.text();
+            if (this.basePath === APIBasePath.Book_Seller_Example) {
+              const XMLasJson: BookSellerExampleBookFromXml =
                 await XMLJSONFromString(textResponse);
               return XMLasJson.document.children.map(
-                (item: BookByAuthorXMLJson) => {
-                  return BookFromXMLJsonTransformer(item);
+                (item: BookSellerExampleXMLJson) => {
+                  return BookFromBookSellerExampleXMLJsonTransformer(item);
                 },
               );
-
-            default:
-              throw new Error(`Unexpected format: ${this.format}`);
-          }
+            } else {
+              return undefined;
+            }
+          default:
+            throw new Error(`Unexpected format: ${this.format}`);
+        }
       })
       .catch((e) => {
         throw new Error(
           `Failed to get books by author from ${this.basePath}: ${e}`,
         );
       });
+  }
 
-    return result;
+  getBooksByAuthor(
+    authorName: string,
+    limit: number = 10,
+  ): Promise<Book[] | undefined> | undefined {
+    if (this.basePath === APIBasePath.Book_Seller_Example) {
+      const requestInfo = getAuthorPathAndQP(authorName, limit, this.format);
+      return this.getBookByQuery(requestInfo.queryParams, requestInfo.path);
+    } else {
+      return undefined;
+    }
+  }
+
+  getBooksByPublisher(
+    publisherName: string,
+    limit: number = 10,
+  ): Promise<Book[] | undefined> | undefined {
+    if (this.basePath === APIBasePath.Book_Seller_Example) {
+      const requestInfo = getPublisherPathAndQP(
+        publisherName,
+        limit,
+        this.format,
+      );
+
+      return this.getBookByQuery(requestInfo.queryParameters, requestInfo.path);
+    } else {
+      return undefined;
+    }
+  }
+
+  getBookByYearPublished(
+    yearPublished: string,
+    limit: number = 10,
+  ): Promise<Book[] | undefined> | undefined {
+    if (this.basePath === APIBasePath.Book_Seller_Example) {
+      const requestInfo = getYearPublishedPathAndQP(
+        yearPublished,
+        limit,
+        this.format,
+      );
+
+      return this.getBookByQuery(requestInfo.queryParameters, requestInfo.path);
+    } else {
+      return undefined;
+    }
   }
 }

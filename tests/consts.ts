@@ -1,7 +1,7 @@
-import { BookByAuthorDto } from '../src/dto/books.dto';
-import { BookByAuthor } from '../types/books.types';
+import { BookSellerExampleDto } from '../src/book-seller-example/dto/bookSellerExample.dto';
+import { Book } from '../types/books.types';
 
-export const mockBooksJSON: BookByAuthorDto[] = [
+export const mockBooksJSON: BookSellerExampleDto[] = [
   {
     book: {
       title: 'Romeo and Juliet',
@@ -29,7 +29,7 @@ export const mockBooksJSON: BookByAuthorDto[] = [
 //need to check this format
 export const mockBooksXML: string = `<document><children><book><title>Romeo and Juliet</title><author>Shakespeare</author><isbn>9781844669363</isbn></book><stock><quantity>5</quantity><price>9.99</price></stock></children><children><book><title>Hamlet</title><author>Shakespeare</author><isbn>97818446695673</isbn></book><stock><quantity>9</quantity><price>12.99</price></stock></children></document>`;
 
-export const mockTransformedBooks: BookByAuthor[] = [
+export const mockTransformedBooks: Book[] = [
   {
     title: 'Romeo and Juliet',
     author: 'Shakespeare',

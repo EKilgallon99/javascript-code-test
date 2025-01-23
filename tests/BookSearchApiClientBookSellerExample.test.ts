@@ -1,13 +1,18 @@
-import exp from 'constants';
 import { BookSearchApiClient } from '../src/BookSearchApiClient.ts';
 import { mockBooksXML, mockBooksJSON, mockTransformedBooks } from './consts.ts';
+import { APIBasePath } from '../src/api.ts';
 
-describe('Book Search API CLient', () => {
+describe('Book Search API CLient - book_seller_example', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('Should get books by author - JSON format', async () => {
+  it('Should call the default api when base path is not passed into constructor', async () => {
+    const client = new BookSearchApiClient('json');
+    expect(client.basePath).toEqual('http://api.book-seller-example.com');
+  });
+
+  it('Should get books by query - JSON format', async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         json: () => Promise.resolve(JSON.stringify(mockBooksJSON)),
@@ -15,7 +20,10 @@ describe('Book Search API CLient', () => {
       }),
     ) as jest.Mock;
 
-    const client = new BookSearchApiClient('json');
+    const client = new BookSearchApiClient(
+      'json',
+      APIBasePath.Book_Seller_Example,
+    );
     const res = await client.getBooksByAuthor('Shakespeare', 10);
     expect(global.fetch).toHaveBeenCalledWith(
       'http://api.book-seller-example.com/by-author?q=Shakespeare&limit=10&format=json',
@@ -24,7 +32,7 @@ describe('Book Search API CLient', () => {
     expect(res).toEqual(mockTransformedBooks);
   });
 
-  it('Should get books by author - XML format', async () => {
+  it('Should get books by query - XML format', async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         text: () => Promise.resolve(mockBooksXML),
@@ -32,7 +40,10 @@ describe('Book Search API CLient', () => {
       }),
     ) as jest.Mock;
 
-    const client = new BookSearchApiClient('xml');
+    const client = new BookSearchApiClient(
+      'xml',
+      APIBasePath.Book_Seller_Example,
+    );
     const res = await client.getBooksByAuthor('Shakespeare', 10);
     expect(global.fetch).toHaveBeenCalledWith(
       'http://api.book-seller-example.com/by-author?q=Shakespeare&limit=10&format=xml',
@@ -43,7 +54,10 @@ describe('Book Search API CLient', () => {
   });
 
   it('Should throw the correct error for unexpected formats', async () => {
-    const client = new BookSearchApiClient('csv');
+    const client = new BookSearchApiClient(
+      'csv',
+      APIBasePath.Book_Seller_Example,
+    );
     await expect(client.getBooksByAuthor('Shakespeare', 10)).rejects.toThrow(
       new Error(
         'Failed to get books by author from http://api.book-seller-example.com: Error: Unexpected format: csv',
@@ -52,15 +66,15 @@ describe('Book Search API CLient', () => {
   });
 
   it('Should throw the correct error for failed fetch API calls', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.reject(new Error()),
-    ) as jest.Mock;
-    const client = new BookSearchApiClient('json');
+    global.fetch = jest.fn(() => Promise.reject(new Error())) as jest.Mock;
+    const client = new BookSearchApiClient(
+      'json',
+      APIBasePath.Book_Seller_Example,
+    );
     await expect(client.getBooksByAuthor('Shakespeare', 10)).rejects.toThrow(
       new Error(
-        "Failed to get books by author from http://api.book-seller-example.com: Error: Fetch failed: Error"
-      )
-    )
-  })
-
+        'Failed to get books by author from http://api.book-seller-example.com: Error: Fetch failed: Error',
+      ),
+    );
+  });
 });
