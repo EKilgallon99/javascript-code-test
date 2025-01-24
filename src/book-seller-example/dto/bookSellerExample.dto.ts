@@ -12,7 +12,7 @@ export interface BookSellerExampleDto {
   };
 }
 
-export interface BookSellerExampleXMLJson {
+export interface BookSellerExampleXMLJsonDto {
   book: BookSellerExampleXMlJson[];
   stock: BookSellerExampleStockXMLJson[];
 }
@@ -32,6 +32,6 @@ interface BookSellerExampleStockXMLJson {
 
 export interface BookSellerExampleBookFromXml {
   document: {
-    children: BookSellerExampleXMLJson[];
+    children: BookSellerExampleXMLJsonDto[];
   };
 }

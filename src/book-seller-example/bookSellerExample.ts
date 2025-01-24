@@ -5,7 +5,7 @@ export const getAuthorPathAndQP = (
 ) => {
   return {
     path: 'by-author',
-    queryParams: [
+    queryParameters: [
       { key: 'q', value: authorName },
       { key: 'limit', value: limit.toString() },
       { key: 'format', value: format },

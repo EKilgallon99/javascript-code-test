@@ -1,6 +1,6 @@
 import {
   BookSellerExampleDto,
-  BookSellerExampleXMLJson,
+  BookSellerExampleXMLJsonDto,
 } from './dto/bookSellerExample.dto';
 
 export const BookFromBookSellerExampleJsonTransformer = (
@@ -16,7 +16,7 @@ export const BookFromBookSellerExampleJsonTransformer = (
 };
 
 export const BookFromBookSellerExampleXMLJsonTransformer = (
-  data: BookSellerExampleXMLJson,
+  data: BookSellerExampleXMLJsonDto,
 ) => {
   return {
     title: data.book[0].title[0],

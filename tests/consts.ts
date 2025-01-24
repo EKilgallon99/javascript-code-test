@@ -1,5 +1,5 @@
 import { BookSellerExampleDto } from '../src/book-seller-example/dto/bookSellerExample.dto';
-import { Book } from '../types/books.types';
+import { Book } from '../src/types/books.types';
 
 export const mockBooksJSON: BookSellerExampleDto[] = [
   {

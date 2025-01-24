@@ -77,4 +77,15 @@ describe('Book Search API CLient - book_seller_example', () => {
       ),
     );
   });
+
+  it('Should handle an unknown base path', async () => {
+    const client = new BookSearchApiClient(
+      'json',
+      'http://api.incorrect-base-path.com',
+    );
+
+    expect(
+      async () => await client.getBooksByAuthor('Shakespeare', 10),
+    ).rejects.toThrow('Unknown base path: http://api.incorrect-base-path.com');
+  });
 });

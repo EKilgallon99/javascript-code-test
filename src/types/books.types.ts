@@ -1,7 +1,3 @@
-export enum methodType {
-  GET = 'GET',
-}
-
 export enum FormatType {
   JSON = 'json',
   XML = 'xml',
@@ -15,9 +11,4 @@ export interface Book {
   author?: string;
   publisher?: string;
   yearPubished?: string;
-}
-
-export interface QueryParams {
-  key: string;
-  value: string;
 }

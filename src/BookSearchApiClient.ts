@@ -1,14 +1,9 @@
-import {
-  Book,
-  FormatType,
-  methodType,
-  QueryParams,
-} from '../types/books.types';
+import { Book, FormatType } from './types/books.types';
 import { APIBasePath } from './api';
 import {
   BookSellerExampleBookFromXml,
   BookSellerExampleDto,
-  BookSellerExampleXMLJson,
+  BookSellerExampleXMLJsonDto,
 } from './book-seller-example/dto/bookSellerExample.dto';
 import {
   BookFromBookSellerExampleJsonTransformer,
@@ -20,6 +15,8 @@ import {
   getPublisherPathAndQP,
   getYearPublishedPathAndQP,
 } from './book-seller-example/bookSellerExample';
+import { useHttpRequest } from './useHttpRequest';
+import { MethodType, QueryParams } from './types/request.types';
 
 export class BookSearchApiClient {
   format: string;
@@ -30,33 +27,11 @@ export class BookSearchApiClient {
     this.basePath = basePath ? basePath : 'http://api.book-seller-example.com';
   }
 
-  private async useHttpRequest(
-    method: methodType,
-    path: string,
-    queryParams: QueryParams[],
-  ): Promise<Response> {
-    const qpString = queryParams
-      .map((qp) => {
-        return `${qp.key}=${qp.value}`;
-      })
-      .join('&');
-
-    return await fetch(`${this.basePath}/${path}?${qpString}`, {
-      method: method,
-    })
-      .then((res) => {
-        return res;
-      })
-      .catch((e) => {
-        throw new Error(`Fetch failed: ${e}`);
-      });
-  }
-
   private async getBookByQuery(
     queryParams: QueryParams[],
     path: string,
   ): Promise<Book[] | undefined> {
-    return this.useHttpRequest(methodType.GET, path, queryParams)
+    return useHttpRequest(MethodType.GET, path, queryParams, this.basePath)
       .then(async (res: Response) => {
         switch (this.format) {
           case FormatType.JSON:
@@ -76,7 +51,7 @@ export class BookSearchApiClient {
               const XMLasJson: BookSellerExampleBookFromXml =
                 await XMLJSONFromString(textResponse);
               return XMLasJson.document.children.map(
-                (item: BookSellerExampleXMLJson) => {
+                (item: BookSellerExampleXMLJsonDto) => {
                   return BookFromBookSellerExampleXMLJsonTransformer(item);
                 },
               );
@@ -98,18 +73,26 @@ export class BookSearchApiClient {
     authorName: string,
     limit: number = 10,
   ): Promise<Book[] | undefined> | undefined {
+    let path = '';
+    let queryParameters: QueryParams[] = [];
     if (this.basePath === APIBasePath.Book_Seller_Example) {
       const requestInfo = getAuthorPathAndQP(authorName, limit, this.format);
-      return this.getBookByQuery(requestInfo.queryParams, requestInfo.path);
+
+      path = requestInfo.path;
+      queryParameters = requestInfo.queryParameters;
     } else {
-      return undefined;
+      throw new Error(`Unknown base path: ${this.basePath}`);
     }
+
+    return this.getBookByQuery(queryParameters, path);
   }
 
   getBooksByPublisher(
     publisherName: string,
     limit: number = 10,
   ): Promise<Book[] | undefined> | undefined {
+    let path = '';
+    let queryParameters: QueryParams[] = [];
     if (this.basePath === APIBasePath.Book_Seller_Example) {
       const requestInfo = getPublisherPathAndQP(
         publisherName,
@@ -117,16 +100,22 @@ export class BookSearchApiClient {
         this.format,
       );
 
-      return this.getBookByQuery(requestInfo.queryParameters, requestInfo.path);
+      path = requestInfo.path;
+      queryParameters = requestInfo.queryParameters;
     } else {
-      return undefined;
+      throw new Error(`Unknown base path: ${this.basePath}`);
     }
+
+    return this.getBookByQuery(queryParameters, path);
   }
 
   getBookByYearPublished(
     yearPublished: string,
     limit: number = 10,
   ): Promise<Book[] | undefined> | undefined {
+    let path = '';
+    let queryParameters: QueryParams[] = [];
+
     if (this.basePath === APIBasePath.Book_Seller_Example) {
       const requestInfo = getYearPublishedPathAndQP(
         yearPublished,
@@ -134,9 +123,12 @@ export class BookSearchApiClient {
         this.format,
       );
 
-      return this.getBookByQuery(requestInfo.queryParameters, requestInfo.path);
+      path = requestInfo.path;
+      queryParameters = requestInfo.queryParameters;
     } else {
-      return undefined;
+      throw new Error(`Unknown base path: ${this.basePath}`);
     }
+
+    return this.getBookByQuery(queryParameters, path);
   }
 }
